@@ -32,9 +32,7 @@
 #include <stddef.h>
 #include <stdarg.h>
 
-#ifdef TEST
-#include <stdio.h>
-#endif /* TEST */
+int putchar(int c);
 
 static void simple_outputchar(char **str, char c)
 {
@@ -84,12 +82,12 @@ static int prints(char **out, const char *string, int width, int flags)
 
 #define PRINT_BUF_LEN 64
 
-static int simple_outputi(char **out, int i, int base, int sign, int width, int flags, int letbase)
+static int simple_outputi(char **out, long long i, int base, int sign, int width, int flags, int letbase)
 {
 	char print_buf[PRINT_BUF_LEN];
 	char *s;
 	int t, neg = 0, pc = 0;
-	unsigned int u = i;
+	unsigned long long u = i;
 
 	if (i == 0) {
 		print_buf[0] = '0';
@@ -138,6 +136,14 @@ static int simple_vsprintf(char **out, char *format, va_list ap)
 		char *s;
 		int i;
 		unsigned int u;
+		long li;
+		unsigned long lu;
+		long long lli;
+		unsigned long long llu;
+		short hi;
+		unsigned short hu;
+		signed char hhi;
+		unsigned char hhu;
 		void *p;
 	} u;
 
@@ -174,17 +180,17 @@ static int simple_vsprintf(char **out, char *format, va_list ap)
 
 				case('u'):
 					u.u = va_arg(ap, unsigned int);
-					pc += simple_outputi(out, u.u, 10, 0, width, flags, 'a');
+					pc += simple_outputi(out, u.lli, 10, 0, width, flags, 'a');
 					break;
 
 				case('x'):
 					u.u = va_arg(ap, unsigned int);
-					pc += simple_outputi(out, u.u, 16, 0, width, flags, 'a');
+					pc += simple_outputi(out, u.lli, 16, 0, width, flags, 'a');
 					break;
 
 				case('X'):
 					u.u = va_arg(ap, unsigned int);
-					pc += simple_outputi(out, u.u, 16, 0, width, flags, 'A');
+					pc += simple_outputi(out, u.lli, 16, 0, width, flags, 'A');
 					break;
 
 				case('c'):
@@ -197,6 +203,114 @@ static int simple_vsprintf(char **out, char *format, va_list ap)
 				case('s'):
 					u.s = va_arg(ap, char *);
 					pc += prints(out, u.s ? u.s : "(null)", width, flags);
+					break;
+				case('l'):
+					++format;
+					switch (*format) {
+						case('d'):
+							u.li = va_arg(ap, long);
+							pc += simple_outputi(out, u.li, 10, 1, width, flags, 'a');
+							break;
+
+						case('u'):
+							u.lu = va_arg(ap, unsigned long);
+							pc += simple_outputi(out, u.lli, 10, 0, width, flags, 'a');
+							break;
+
+						case('x'):
+							u.lu = va_arg(ap, unsigned long);
+							pc += simple_outputi(out, u.lli, 16, 0, width, flags, 'a');
+							break;
+
+						case('X'):
+							u.lu = va_arg(ap, unsigned long);
+							pc += simple_outputi(out, u.lli, 16, 0, width, flags, 'A');
+							break;
+
+						case('l'):
+							++format;
+							switch (*format) {
+								case('d'):
+									u.lli = va_arg(ap, long long);
+									pc += simple_outputi(out, u.lli, 10, 1, width, flags, 'a');
+									break;
+
+								case('u'):
+									u.llu = va_arg(ap, unsigned long long);
+									pc += simple_outputi(out, u.lli, 10, 0, width, flags, 'a');
+									break;
+
+								case('x'):
+									u.llu = va_arg(ap, unsigned long long);
+									pc += simple_outputi(out, u.lli, 16, 0, width, flags, 'a');
+									break;
+
+								case('X'):
+									u.llu = va_arg(ap, unsigned long long);
+									pc += simple_outputi(out, u.lli, 16, 0, width, flags, 'A');
+									break;
+
+								default:
+									break;
+							}
+							break;
+						default:
+							break;
+					}
+					break;
+				case('h'):
+					++format;
+					switch (*format) {
+						case('d'):
+							u.hi = va_arg(ap, int);
+							pc += simple_outputi(out, u.hi, 10, 1, width, flags, 'a');
+							break;
+
+						case('u'):
+							u.hu = va_arg(ap, unsigned int);
+							pc += simple_outputi(out, u.lli, 10, 0, width, flags, 'a');
+							break;
+
+						case('x'):
+							u.hu = va_arg(ap, unsigned int);
+							pc += simple_outputi(out, u.lli, 16, 0, width, flags, 'a');
+							break;
+
+						case('X'):
+							u.hu = va_arg(ap, unsigned int);
+							pc += simple_outputi(out, u.lli, 16, 0, width, flags, 'A');
+							break;
+
+						case('h'):
+							++format;
+							switch (*format) {
+								case('d'):
+									u.hhi = va_arg(ap, int);
+									pc += simple_outputi(out, u.hhi, 10, 1, width, flags, 'a');
+									break;
+
+								case('u'):
+									u.hhu = va_arg(ap, unsigned int);
+									pc += simple_outputi(out, u.lli, 10, 0, width, flags, 'a');
+									break;
+
+								case('x'):
+									u.hhu = va_arg(ap, unsigned int);
+									pc += simple_outputi(out, u.lli, 16, 0, width, flags, 'a');
+									break;
+
+								case('X'):
+									u.hhu = va_arg(ap, unsigned int);
+									pc += simple_outputi(out, u.lli, 16, 0, width, flags, 'A');
+									break;
+
+								default:
+									break;
+							}
+							break;
+						default:
+							break;
+					}
 					break;
 				default:
 					break;
