@@ -180,17 +180,17 @@ static int simple_vsprintf(char **out, char *format, va_list ap)
 
 				case('u'):
 					u.u = va_arg(ap, unsigned int);
-					pc += simple_outputi(out, u.lli, 10, 0, width, flags, 'a');
+					pc += simple_outputi(out, u.u, 10, 0, width, flags, 'a');
 					break;
 
 				case('x'):
 					u.u = va_arg(ap, unsigned int);
-					pc += simple_outputi(out, u.lli, 16, 0, width, flags, 'a');
+					pc += simple_outputi(out, u.u, 16, 0, width, flags, 'a');
 					break;
 
 				case('X'):
 					u.u = va_arg(ap, unsigned int);
-					pc += simple_outputi(out, u.lli, 16, 0, width, flags, 'A');
+					pc += simple_outputi(out, u.u, 16, 0, width, flags, 'A');
 					break;
 
 				case('c'):
